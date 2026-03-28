@@ -8,7 +8,8 @@ from routes import api_bp
 from ml_model import rec_system
 from config import Config
 from redis_client import redis_available
-from database import bootstrap_postgres_from_json
+from database import bootstrap_postgres_from_json, db, using_postgres
+from pg_db import db as postgres_db
 
 
 DEFAULT_CORS_ORIGINS = (
@@ -54,6 +55,23 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    print("=" * 50)
+    print("Database Diagnostics")
+    print(f"  DB_BACKEND config: {Config.DB_BACKEND}")
+    print(f"  DATABASE_URL set: {bool(Config.DATABASE_URL)}")
+    print(f"  Postgres session ready: {postgres_db.SessionLocal is not None}")
+    if postgres_db.init_error is not None:
+        print(f"  Postgres init error: {postgres_db.init_error}")
+    print(f"  Active backend: {'postgres' if using_postgres() else 'json'}")
+    try:
+        product_count = len(db.find('products', {}, limit=5))
+        user_count = len(db.find('users', {}, limit=5))
+        print(f"  Sample products visible: {product_count}")
+        print(f"  Sample users visible: {user_count}")
+    except Exception as exc:
+        print(f"  Data visibility check failed: {exc}")
+    print("=" * 50)
 
     bootstrap_result = bootstrap_postgres_from_json()
     if bootstrap_result.get("bootstrapped"):

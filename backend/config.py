@@ -5,7 +5,8 @@ Application configuration with environment variable management.
 import os
 from dotenv import load_dotenv
 
-load_dotenv(override=True)
+# Let platform env vars win in production, while still supporting local .env files.
+load_dotenv(override=False)
 
 
 class Config:
@@ -28,6 +29,7 @@ class Config:
     APP_NAME = os.getenv("APP_NAME", "AmazonRecs")
     DEBUG = APP_ENV == "development"
     RUN_ML_EVAL_ON_STARTUP = os.getenv("RUN_ML_EVAL_ON_STARTUP", "false").lower() == "true"
+    LOAD_ML_ON_STARTUP = os.getenv("LOAD_ML_ON_STARTUP", "true").lower() == "true"
 
     # SMTP
     SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")

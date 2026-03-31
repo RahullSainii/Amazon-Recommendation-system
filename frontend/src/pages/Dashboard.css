@@ -1,0 +1,17 @@
+/* Dashboard-specific styles — supplementary to index.css design system */
+
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: var(--clr-text-muted);
+  animation: pulse 1.5s infinite;
+}
+
+/* Spinning icon for refresh */
+.spinning {
+  animation: spin 0.8s linear infinite;
+}

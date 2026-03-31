@@ -1,0 +1,70 @@
+.auth-page {
+  min-height: calc(100vh - 84px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 14px;
+  background:
+    radial-gradient(circle at 10% 18%, rgba(245, 158, 11, 0.14), transparent 30%),
+    radial-gradient(circle at 88% 80%, rgba(3, 105, 161, 0.14), transparent 28%),
+    linear-gradient(160deg, #f8fafc 0%, #e7eef9 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 30px;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 36px rgba(15, 23, 42, 0.13);
+}
+
+.auth-head {
+  text-align: center;
+}
+
+.auth-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.03em;
+}
+
+.auth-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
+}
+
+.auth-head h2 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.auth-footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.auth-footer a {
+  color: #0f172a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}

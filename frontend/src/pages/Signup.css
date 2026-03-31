@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+.signup-page {
+  min-height: calc(100vh - 84px);
+  padding: 30px 14px;
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at 7% 12%, rgba(245, 158, 11, 0.18), transparent 30%),
+    radial-gradient(circle at 94% 85%, rgba(15, 118, 110, 0.16), transparent 28%),
+    linear-gradient(140deg, #f6f9ff 0%, #e8eefc 100%);
+}
+
+.signup-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 26px 46px rgba(15, 23, 42, 0.12);
+}
+
+.signup-panel {
+  padding: 34px 32px;
+}
+
+.signup-brand {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.signup-logo {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 14px;
+}
+
+.signup-brand h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.signup-brand p {
+  margin: 6px 0 0;
+  color: #475569;
+}
+
+.signup-error {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.signup-form {
+  display: grid;
+  gap: 8px;
+}
+
+.signup-form label {
+  margin-top: 4px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.signup-form input {
+  height: 46px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 0.95rem;
+}
+
+.signup-form input:focus {
+  outline: none;
+  border-color: #0369a1;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+}
+
+.signup-password-wrap {
+  position: relative;
+}
+
+.signup-password-wrap input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.signup-password-wrap button {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #f1f5f9;
+  color: #334155;
+  cursor: pointer;
+}
+
+.signup-submit {
+  margin-top: 10px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(130deg, #0ea5e9 0%, #0284c7 100%);
+  color: #fff;
+  font-size: 0.96rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.signup-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.signup-footer {
+  margin: 16px 0 0;
+  color: #475569;
+}
+
+.signup-footer a {
+  color: #0f172a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.signup-footer a:hover {
+  text-decoration: underline;
+}
+
+.signup-aside {
+  padding: 34px 30px;
+  background: linear-gradient(150deg, #0f172a 0%, #0b3042 100%);
+  color: #e2e8f0;
+}
+
+.signup-aside h3 {
+  margin: 0 0 10px;
+  font-size: 1.45rem;
+  color: #f8fafc;
+}
+
+.signup-aside ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.signup-aside li {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.password-guide {
+  margin-top: 22px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.38);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.password-guide h4 {
+  margin: 0 0 8px;
+  color: #f8fafc;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: #cbd5e1;
+}
+
+.check-item svg {
+  color: #64748b;
+}
+
+.check-item.ok {
+  color: #ccfbf1;
+}
+
+.check-item.ok svg {
+  color: #2dd4bf;
+}
+
+@media (max-width: 960px) {
+  .signup-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .signup-aside {
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .signup-panel,
+  .signup-aside {
+    padding: 24px 18px;
+  }
+
+  .signup-brand h2 {
+    font-size: 1.6rem;
+  }
+}

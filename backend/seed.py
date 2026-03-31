@@ -16,6 +16,8 @@ def seed_db():
         if os.path.exists(csv_path):
             print(f"Loading data from {csv_path}...")
             df = pd.read_csv(csv_path)
+            # Postgres JSONB rejects NaN, so normalize missing CSV values to null.
+            df = df.astype(object).where(pd.notnull(df), None)
             products = df.to_dict('records')
             # Clear existing
             db.delete_many("products", {})

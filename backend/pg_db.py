@@ -1,5 +1,6 @@
 import copy
 from datetime import datetime, timezone
+from urllib.parse import parse_qsl, quote, unquote, urlencode, urlparse, urlunparse
 
 from sqlalchemy import DateTime, Integer, String, Text, create_engine, select
 from sqlalchemy.dialects.postgresql import JSONB
@@ -45,15 +46,23 @@ class PostgresDatabase:
         self.SessionLocal = None
         self.init_error = None
 
-        if database_url:
+        candidate_urls = [self.database_url] if self.database_url else []
+        fallback_url = self._normalize_database_url(Config.DIRECT_URL)
+        if fallback_url and fallback_url not in candidate_urls:
+            candidate_urls.append(fallback_url)
+
+        for candidate_url in candidate_urls:
             try:
                 self.engine = create_engine(
-                    self.database_url,
+                    candidate_url,
                     future=True,
                     pool_pre_ping=True,
                 )
                 self.SessionLocal = sessionmaker(bind=self.engine, future=True, expire_on_commit=False)
                 Base.metadata.create_all(self.engine)
+                self.database_url = candidate_url
+                self.init_error = None
+                break
             except Exception as exc:
                 self.init_error = exc
                 self.engine = None
@@ -63,11 +72,45 @@ class PostgresDatabase:
     def _normalize_database_url(database_url: str) -> str:
         if not database_url:
             return database_url
-        if database_url.startswith("postgresql://"):
-            return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
-        if database_url.startswith("postgres://"):
-            return database_url.replace("postgres://", "postgresql+psycopg://", 1)
-        return database_url
+
+        parsed = urlparse(database_url)
+        scheme = parsed.scheme
+        if scheme == "postgresql":
+            scheme = "postgresql+psycopg"
+        elif scheme == "postgres":
+            scheme = "postgresql+psycopg"
+
+        query_pairs = [(key, value) for key, value in parse_qsl(parsed.query, keep_blank_values=True) if key != "pgbouncer"]
+        username = unquote(parsed.username or "")
+        password = unquote(parsed.password or "")
+        hostname = parsed.hostname or ""
+        port = f":{parsed.port}" if parsed.port else ""
+
+        # Supabase pooler commonly needs "postgres.<project-ref>" instead of just "postgres".
+        if hostname.endswith(".pooler.supabase.com") and username == "postgres":
+            project_ref = PostgresDatabase._project_ref_from_direct_url(Config.DIRECT_URL)
+            if project_ref:
+                username = f"{username}.{project_ref}"
+
+        netloc = ""
+        if username:
+            netloc += quote(username, safe="")
+            if password:
+                netloc += f":{quote(password, safe='')}"
+            netloc += "@"
+        netloc += f"{hostname}{port}"
+
+        return urlunparse((scheme, netloc, parsed.path, parsed.params, urlencode(query_pairs), parsed.fragment))
+
+    @staticmethod
+    def _project_ref_from_direct_url(direct_url: str) -> str:
+        if not direct_url:
+            return ""
+        parsed = urlparse(direct_url)
+        hostname = parsed.hostname or ""
+        if hostname.startswith("db.") and hostname.endswith(".supabase.co"):
+            return hostname[len("db.") : -len(".supabase.co")]
+        return ""
 
     def _session(self) -> Session:
         if self.SessionLocal is None:

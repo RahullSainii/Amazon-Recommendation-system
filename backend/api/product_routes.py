@@ -5,6 +5,7 @@ from ml_model import rec_system
 
 from . import api_bp
 from .services import cache_similar_products, get_cached_similar_products
+from .utils import get_product_record
 from .validators import bounded_int_arg
 
 
@@ -15,7 +16,7 @@ def get_products():
 
 @api_bp.route("/products/<product_id>", methods=["GET"])
 def get_product_details(product_id):
-    product = rec_system.get_product_details(product_id)
+    product = get_product_record(product_id)
     if not product:
         return jsonify({"message": "Product not found"}), 404
     return jsonify(product), 200

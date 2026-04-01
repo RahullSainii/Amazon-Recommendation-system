@@ -6,7 +6,7 @@ from ml_model import rec_system
 
 from . import api_bp
 from .services import build_cart_response, create_order, log_interaction
-from .utils import get_or_create_doc, now_iso
+from .utils import get_or_create_doc, get_product_record, now_iso
 from .validators import error_response, json_body
 
 
@@ -77,7 +77,7 @@ def remove_cart_item(product_id):
 @token_required
 def get_wishlist():
     wishlist = get_or_create_doc("wishlists", request.user_id, {"product_ids": [], "updated_at": now_iso()})
-    products = [rec_system.get_product_details(pid) for pid in wishlist.get("product_ids", [])]
+    products = [get_product_record(pid) for pid in wishlist.get("product_ids", [])]
     products = [product for product in products if product]
     return jsonify({"items": products, "count": len(products)}), 200
 

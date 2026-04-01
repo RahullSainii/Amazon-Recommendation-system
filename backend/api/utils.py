@@ -47,13 +47,20 @@ def get_or_create_doc(collection, user_id, default_payload=None):
     return payload
 
 
+def get_product_record(product_id):
+    product = rec_system.get_product_details(product_id)
+    if product:
+        return product
+    return db.find_one("products", {"product_id": product_id})
+
+
 def hydrate_cart_items(items):
     hydrated = []
     subtotal = 0.0
     for item in items:
         product_id = item.get("product_id")
         quantity = int(item.get("quantity", 1))
-        product = rec_system.get_product_details(product_id)
+        product = get_product_record(product_id)
         if not product:
             continue
         unit_price = parse_price(product.get("discounted_price") or product.get("price"))

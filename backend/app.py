@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -58,6 +58,26 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    @app.get("/")
+    def index():
+        return jsonify(
+            {
+                "name": Config.APP_NAME,
+                "status": "ok",
+                "message": "Amazon Recommendation System backend is running.",
+                "docs": {
+                    "products": "/api/products?limit=10",
+                    "login": "/api/auth/login",
+                    "signup": "/api/auth/signup",
+                    "ml_health": "/api/ml/health",
+                },
+            }
+        ), 200
+
+    @app.get("/health")
+    def health():
+        return jsonify({"status": "ok"}), 200
 
     print("=" * 50)
     print("Database Diagnostics")

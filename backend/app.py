@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import os
+import re
 from dotenv import load_dotenv
 from routes import api_bp
 from ml_model import rec_system
@@ -16,6 +17,8 @@ DEFAULT_CORS_ORIGINS = (
     "http://localhost:3000",
     "https://amazon-recsys-frontend.onrender.com",
     "https://amazon-recommendation-system-1.onrender.com",
+    "https://amazon-recommendation-system-j3tl.vercel.app",
+    re.compile(r"^https://amazon-recommendation-system(?:-[a-z0-9]+)?\.vercel\.app$"),
 )
 
 
@@ -40,7 +43,7 @@ def create_app():
     app.config["SECRET_KEY"] = Config.SECRET_KEY
     cors_origins = resolve_cors_origins()
     if cors_origins == "*":
-        CORS(app)
+        CORS(app, resources={r"/api/*": {"origins": "*"}})
     else:
         CORS(app, resources={r"/api/*": {"origins": cors_origins}})
 

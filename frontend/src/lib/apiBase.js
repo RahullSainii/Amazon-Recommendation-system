@@ -1,5 +1,5 @@
 const DEFAULT_LOCAL_API_URL = 'http://localhost:5000';
-const DEFAULT_PRODUCTION_API_URL = 'https://amazon-recsys-backend.onrender.com';
+const DEFAULT_PRODUCTION_API_URL = 'https://amazon-recommendation-system-2.onrender.com';
 
 const normalizeBaseUrl = (value) => value.replace(/\/+$/, '');
 

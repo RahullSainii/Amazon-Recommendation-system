@@ -70,13 +70,15 @@ class RecommendationSystem:
     def load_and_preprocess(self, run_evaluation=True) -> bool:
         """Load CSV, clean data, build features, and train models."""
         default_data_file = os.path.join(os.path.dirname(__file__), "data", "amazon.csv")
+        use_default_fallback = not self.data_path or self.data_path == "amazon.csv"
         candidate_paths = []
         if self.data_path:
             candidate_paths.append(self.data_path)
             if not os.path.isabs(self.data_path):
                 candidate_paths.append(os.path.join(os.path.dirname(__file__), self.data_path))
                 candidate_paths.append(os.path.join(os.path.dirname(__file__), "data", self.data_path))
-        candidate_paths.append(default_data_file)
+        if use_default_fallback:
+            candidate_paths.append(default_data_file)
 
         data_file = next((path for path in candidate_paths if os.path.exists(path)), None)
         if data_file is None:
@@ -420,6 +422,9 @@ class RecommendationSystem:
     def _evaluate(self):
         """
         Offline evaluation with train/test split.
+        Methodology: Temporal train/test split (80/20 per user) to prevent data leakage.
+        A temporary collaborative filtering model is built strictly on the training set,
+        and predictions are evaluated against held-out test items.
         Computes Precision@K, Recall@K, NDCG@K, and Coverage.
         """
         if self.interactions_df is None or len(self.interactions_df) < 20:
@@ -433,26 +438,110 @@ class RecommendationSystem:
         logger.info("Running offline evaluation...")
 
         K = 10
-        # Split: for each user take last 20% interactions as test
+        # 1. Split interactions into train (80%) and test (20%) per user
         grouped = self.interactions_df.groupby("user_id")
+        
+        train_rows = []
+        test_items_per_user = {}
+        
+        for uid, group in grouped:
+            if len(group) < 3:
+                train_rows.append(group)
+                continue
+            
+            n_test = max(1, int(len(group) * 0.2))
+            train_group = group.iloc[:-n_test]
+            test_group = group.iloc[-n_test:]
+            
+            train_rows.append(train_group)
+            test_items_per_user[uid] = set(test_group["product_id"].tolist())
+
+        train_df = pd.concat(train_rows, ignore_index=True)
+        
+        # 2. Build temporary collaborative filtering model using ONLY training interactions
+        unique_users = train_df["user_id"].unique()
+        unique_items = train_df["product_id"].unique()
+        
+        temp_user_id_map = {uid: i for i, uid in enumerate(unique_users)}
+        temp_item_id_map = {pid: j for j, pid in enumerate(unique_items)}
+        temp_reverse_item_map = {j: pid for pid, j in temp_item_id_map.items()}
+        
+        n_users_train = len(unique_users)
+        n_items_train = len(unique_items)
+        
+        temp_user_factors = None
+        temp_item_factors = None
+        temp_sigma = None
+        
+        if n_users_train > 0 and n_items_train > 0:
+            rows = train_df["user_id"].map(temp_user_id_map).values
+            cols = train_df["product_id"].map(temp_item_id_map).values
+            ratings = train_df["rating"].values.astype(np.float32)
+            ratings[ratings == 0] = 3.0
+            
+            ui_matrix = csr_matrix((ratings, (rows, cols)), shape=(n_users_train, n_items_train))
+            
+            n_factors = 50
+            k = min(n_factors, min(n_users_train, n_items_train) - 1)
+            
+            if k >= 1:
+                U, sigma, Vt = svds(ui_matrix.astype(float), k=k)
+                temp_user_factors = U
+                temp_sigma = np.diag(sigma)
+                temp_item_factors = Vt
 
         precision_list = []
         recall_list = []
         ndcg_list = []
         all_recommended = set()
 
-        for uid, group in grouped:
-            if len(group) < 3:
-                continue
-
-            n_test = max(1, int(len(group) * 0.2))
-            test_items = set(group["product_id"].iloc[-n_test:].tolist())
-
-            # Get recommendations (using full model for simplicity)
-            recs = self.get_user_recommendations(uid, K)
-            rec_pids = [r.get("product_id") for r in recs if r.get("product_id")]
+        for uid, test_items in test_items_per_user.items():
+            # 3. Generate recommendations from the temporary model
+            scored = []
+            
+            # Temporary CF predictions
+            if temp_user_factors is not None and uid in temp_user_id_map:
+                u_idx = temp_user_id_map[uid]
+                cf_scores = np.dot(
+                    np.dot(temp_user_factors[u_idx, :], temp_sigma),
+                    temp_item_factors,
+                )
+                cf_min, cf_max = cf_scores.min(), cf_scores.max()
+                if cf_max - cf_min > 0:
+                    cf_norm = (cf_scores - cf_min) / (cf_max - cf_min)
+                else:
+                    cf_norm = np.zeros_like(cf_scores)
+                    
+                for col_idx in range(len(cf_scores)):
+                    pid = temp_reverse_item_map.get(col_idx)
+                    if pid is None:
+                        continue
+                    
+                    product_row = self.df[self.df["product_id"] == pid]
+                    if product_row.empty:
+                        continue
+                    df_idx = product_row.index[0]
+                    pop = self.popularity_scores[df_idx] if self.popularity_scores is not None else 0
+                    hybrid = 0.7 * cf_norm[col_idx] + 0.3 * pop
+                    scored.append((df_idx, hybrid, pid))
+            else:
+                # Fallback to popularity
+                if self.popularity_scores is not None:
+                    for df_idx in range(len(self.df)):
+                        pid = self.df.iloc[df_idx]["product_id"]
+                        pop = self.popularity_scores[df_idx]
+                        scored.append((df_idx, pop, pid))
+            
+            # Remove items user already interacted with IN THE TRAINING SET
+            interacted = set(train_df[train_df["user_id"] == uid]["product_id"].tolist())
+            scored = [(idx, s, pid) for idx, s, pid in scored if pid not in interacted]
+            
+            scored.sort(key=lambda x: x[1], reverse=True)
+            top_scored = scored[:K]
+            rec_pids = [t[2] for t in top_scored]
             all_recommended.update(rec_pids)
 
+            # 4. Evaluate against held-out test items
             hits = [1 if pid in test_items else 0 for pid in rec_pids]
 
             precision = sum(hits) / K if K > 0 else 0
@@ -489,6 +578,7 @@ class RecommendationSystem:
             "ndcg_at_10": round(avg_ndcg, 4),
             "catalog_coverage": round(coverage, 4),
             "model_type": "Hybrid (SVD-CF + TF-IDF Content + Popularity)",
+            "methodology": "Temporal train/test split (80/20 per user), no data leakage",
         }
         logger.info("Evaluation metrics: %s", self.eval_metrics)
 

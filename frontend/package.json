@@ -22,6 +22,11 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^axios$": "axios/dist/node/axios.cjs"
+    }
+  },
   "overrides": {
     "schema-utils@4.3.3": {
       "ajv": "^8.17.1",

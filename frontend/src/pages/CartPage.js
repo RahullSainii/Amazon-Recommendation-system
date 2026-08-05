@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useShop } from '../context/ShopContext';
 import { ShoppingCart, Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-react';
+import ProductImage from '../components/ProductImage';
 
 const CartPage = () => {
   const { cart, updateCartQuantity, removeFromCart } = useShop();
@@ -42,10 +43,7 @@ const CartPage = () => {
             return (
               <div key={item.product_id} className={`card animate-fade-in-up stagger-${(i % 8) + 1}`} style={styles.cartItem}>
                 <Link to={`/product/${item.product_id}`} style={styles.itemImage}>
-                  <img src={product.img_link} alt={title}
-                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/100?text=No+Image'; }}
-                  />
+                  <ProductImage src={product.img_link} alt={title} height={100} fallbackLabel="No image" />
                 </Link>
                 <div style={styles.itemInfo}>
                   <Link to={`/product/${item.product_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -55,7 +53,7 @@ const CartPage = () => {
                     {product.category ? product.category.split('|')[0] : ''}
                   </div>
                   <div style={styles.itemPrice}>
-                    ₹{item.unit_price?.toFixed(2)} × {item.quantity} = <strong>₹{item.line_total?.toFixed(2)}</strong>
+                    Rs {item.unit_price?.toFixed(2)} x {item.quantity} = <strong>Rs {item.line_total?.toFixed(2)}</strong>
                   </div>
                   <div style={styles.qtyControls}>
                     <button className="btn-icon" style={{ width: '30px', height: '30px' }}
@@ -83,7 +81,7 @@ const CartPage = () => {
           <h3 style={{ marginBottom: '16px', fontSize: '1.1rem' }}>Order Summary</h3>
           <div style={styles.summaryRow}>
             <span>Subtotal ({items.length} items)</span>
-            <strong>₹{cart.subtotal?.toFixed(2)}</strong>
+            <strong>Rs {cart.subtotal?.toFixed(2)}</strong>
           </div>
           <div style={styles.summaryRow}>
             <span>Shipping</span>
@@ -91,7 +89,7 @@ const CartPage = () => {
           </div>
           <div style={{ ...styles.summaryRow, borderTop: '2px solid var(--clr-border)', paddingTop: '12px', marginTop: '8px' }}>
             <strong style={{ fontSize: '1.1rem' }}>Total</strong>
-            <strong style={{ fontSize: '1.2rem', color: 'var(--clr-text)' }}>₹{cart.subtotal?.toFixed(2)}</strong>
+            <strong style={{ fontSize: '1.2rem', color: 'var(--clr-text)' }}>Rs {cart.subtotal?.toFixed(2)}</strong>
           </div>
           <button onClick={() => navigate('/checkout')} className="btn btn-primary"
             style={{ width: '100%', marginTop: '20px', padding: '14px', fontSize: '0.95rem' }}>
@@ -123,8 +121,7 @@ const styles = {
   },
   itemImage: {
     width: '100px', height: '100px', flexShrink: 0,
-    background: '#f8f9fa', borderRadius: '12px',
-    display: 'grid', placeItems: 'center', overflow: 'hidden',
+    display: 'block',
   },
   itemInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' },
   itemTitle: {

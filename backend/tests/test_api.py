@@ -3,6 +3,13 @@ import sys
 
 import pytest
 
+os.environ["APP_ENV"] = "test"
+os.environ["DB_BACKEND"] = "json"
+os.environ["DATABASE_URL"] = ""
+os.environ["DIRECT_URL"] = ""
+os.environ["LOAD_ML_ON_STARTUP"] = "false"
+os.environ["RUN_ML_EVAL_ON_STARTUP"] = "false"
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import app as app_module
@@ -25,10 +32,15 @@ def client(tmp_path, monkeypatch):
     }
     database_module.db.insert_one("products", sample_product)
 
-    monkeypatch.setattr(app_module.rec_system, "load_and_preprocess", lambda: True)
+    monkeypatch.setattr(app_module.rec_system, "load_and_preprocess", lambda *args, **kwargs: True)
     monkeypatch.setattr(app_module.rec_system, "get_metrics", lambda: {"n_items": 1, "n_users": 0, "n_interactions": 0, "model_type": "test"})
     monkeypatch.setattr(rec_system, "get_product_details", lambda product_id: sample_product if product_id == "P001" else None)
     monkeypatch.setattr(rec_system, "get_similar_products", lambda product_id, limit=5: [])
+
+    # Force experiment variant to 'hybrid' so our mocked get_user_recommendations is used
+    import api.services as _svc
+    monkeypatch.setattr(_svc, "get_or_assign_experiment", lambda user_id, experiment_key=None: {"variant_key": "hybrid"})
+    monkeypatch.setattr(_svc, "get_popularity_recommendations", lambda num_recs=8: [])
     monkeypatch.setattr(
         rec_system,
         "get_user_recommendations",

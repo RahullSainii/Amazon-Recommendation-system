@@ -6,6 +6,7 @@ import SearchBar from '../components/SearchBar';
 import { useAuth } from '../context/AuthContext';
 import { useShop } from '../context/ShopContext';
 import API_URL from '../lib/apiBase';
+import ProductImage from '../components/ProductImage';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -72,7 +73,7 @@ const Home = () => {
         if (!user) return navigate('/login');
         try {
             await addToCart(productId, 1);
-            showToast('✓ Added to cart');
+            showToast('Added to cart');
         } catch {
             showToast('Could not add to cart');
         }
@@ -82,7 +83,7 @@ const Home = () => {
         if (!user) return navigate('/login');
         try {
             const result = await toggleWishlist(productId);
-            showToast(result.in_wishlist ? '♥ Added to wishlist' : 'Removed from wishlist');
+            showToast(result.in_wishlist ? 'Added to wishlist' : 'Removed from wishlist');
         } catch {
             showToast('Could not update wishlist');
         }
@@ -190,27 +191,11 @@ const StatCard = ({ icon, value, label }) => (
 );
 
 const ProductCard = ({ product, index, onAddToCart, onWishlist }) => {
-    const [imgLoaded, setImgLoaded] = useState(false);
-
     return (
         <div className={`card animate-fade-in-up stagger-${(index % 8) + 1}`} style={styles.productCard}>
             <Link to={`/product/${product.product_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={styles.imageWrap}>
-                    <img
-                        src={product.img_link}
-                        alt={product.product_name}
-                        style={{
-                            ...styles.productImage,
-                            opacity: imgLoaded ? 1 : 0,
-                        }}
-                        onLoad={() => setImgLoaded(true)}
-                        onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/200x200?text=No+Image';
-                            setImgLoaded(true);
-                        }}
-                    />
-                    {!imgLoaded && <div className="skeleton" style={{ position: 'absolute', inset: 0 }} />}
+                <div style={styles.imageSpacing}>
+                    <ProductImage src={product.img_link} alt={product.product_name} height={200} />
                 </div>
                 <h3 style={styles.productName}>{product.product_name}</h3>
             </Link>
@@ -277,7 +262,7 @@ const styles = {
         lineHeight: 1.15,
         color: '#fff',
         marginBottom: '12px',
-        letterSpacing: '-1px',
+        letterSpacing: 0,
     },
     heroSubtitle: {
         fontSize: '1rem',
@@ -312,7 +297,7 @@ const styles = {
         fontSize: '0.72rem',
         color: 'rgba(255,255,255,0.5)',
         textTransform: 'uppercase',
-        letterSpacing: '0.8px',
+        letterSpacing: '0.06em',
         fontWeight: 600,
         marginTop: '2px',
     },
@@ -353,21 +338,8 @@ const styles = {
         flexDirection: 'column',
         gap: '10px',
     },
-    imageWrap: {
-        position: 'relative',
-        background: '#f8f9fa',
-        borderRadius: '12px',
-        height: '200px',
-        display: 'grid',
-        placeItems: 'center',
-        overflow: 'hidden',
+    imageSpacing: {
         marginBottom: '4px',
-    },
-    productImage: {
-        maxWidth: '100%',
-        maxHeight: '100%',
-        objectFit: 'contain',
-        transition: 'opacity 0.3s, transform 0.4s',
     },
     productName: {
         fontSize: '0.92rem',

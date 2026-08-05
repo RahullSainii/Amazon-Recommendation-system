@@ -28,7 +28,7 @@ function App() {
         <Router>
           <div className="min-h-screen bg-gray-100">
             <Navbar />
-            <main>
+            <main style={{ paddingTop: '8px' }}>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/product/:id" element={<ProductDetails />} />

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useShop } from '../context/ShopContext';
 import { Heart, Star, ShoppingCart, Trash2 } from 'lucide-react';
+import ProductImage from '../components/ProductImage';
 
 const WishlistPage = () => {
   const { wishlist, toggleWishlist, addToCart } = useShop();
@@ -39,10 +40,7 @@ const WishlistPage = () => {
             <div key={product.product_id} className={`card animate-fade-in-up stagger-${(i % 8) + 1}`} style={styles.card}>
               <Link to={`/product/${product.product_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div style={styles.imgWrap}>
-                  <img src={product.img_link} alt={title}
-                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/200?text=No+Image'; }}
-                  />
+                  <ProductImage src={product.img_link} alt={title} height={180} />
                 </div>
                 <h3 style={styles.title}>{title}</h3>
               </Link>
@@ -56,7 +54,7 @@ const WishlistPage = () => {
 
               <div style={styles.actions}>
                 <button className="btn btn-primary" style={{ flex: 1, fontSize: '0.78rem', padding: '8px' }}
-                  onClick={() => { addToCart(product.product_id, 1); showToast('✓ Added to cart'); }}>
+                  onClick={() => { addToCart(product.product_id, 1); showToast('Added to cart'); }}>
                   <ShoppingCart size={13} /> Add to Cart
                 </button>
                 <button className="btn-icon" style={{ width: '34px', height: '34px' }}
@@ -77,8 +75,7 @@ const WishlistPage = () => {
 const styles = {
   card: { padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px' },
   imgWrap: {
-    height: '180px', background: '#f8f9fa', borderRadius: '12px',
-    display: 'grid', placeItems: 'center', overflow: 'hidden', marginBottom: '4px',
+    marginBottom: '4px',
   },
   title: {
     fontSize: '0.88rem', fontWeight: 600, lineHeight: 1.3,

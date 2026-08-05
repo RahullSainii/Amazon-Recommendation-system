@@ -4,6 +4,7 @@ from models import User, Product
 import bcrypt
 import os
 import uuid
+import secrets
 
 def seed_db():
     print("Starting seeding process...")
@@ -33,7 +34,9 @@ def seed_db():
     try:
         db.delete_many("users", {})
         
-        password = "password123".encode('utf-8')
+        # LOCAL DEVELOPMENT ONLY
+        dev_password = secrets.token_urlsafe(12)
+        password = dev_password.encode('utf-8')
         hashed = bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8')
         
         admin_user = {
@@ -55,6 +58,10 @@ def seed_db():
         db.insert_one("users", admin_user)
         db.insert_one("users", sample_user)
         print("Inserted admin and sample users.")
+        print("--- GENERATED CREDENTIALS ---")
+        print(f"Admin: admin / {dev_password}")
+        print(f"Sample User: rahul / {dev_password}")
+        print("-----------------------------")
     except Exception as e:
         print(f"Error seeding users: {e}")
 

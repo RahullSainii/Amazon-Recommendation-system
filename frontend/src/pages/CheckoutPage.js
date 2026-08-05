@@ -93,9 +93,9 @@ const CheckoutPage = () => {
             </h3>
             <div style={styles.paymentOptions}>
               {[
-                { value: 'card', label: 'Credit / Debit Card', icon: '💳' },
-                { value: 'upi', label: 'UPI Payment', icon: '📱' },
-                { value: 'cod', label: 'Cash on Delivery', icon: '💵' },
+                { value: 'card', label: 'Credit / Debit Card', icon: 'Card' },
+                { value: 'upi', label: 'UPI Payment', icon: 'UPI' },
+                { value: 'cod', label: 'Cash on Delivery', icon: 'COD' },
               ].map(opt => (
                 <label key={opt.value} style={{
                   ...styles.paymentOption,
@@ -122,14 +122,14 @@ const CheckoutPage = () => {
               <div key={item.product_id} style={styles.miniItem}>
                 <span style={styles.miniTitle}>{item.product?.product_name || 'Product'}</span>
                 <span style={{ fontWeight: 600, fontSize: '0.85rem', flexShrink: 0 }}>
-                  ×{item.quantity} = ₹{item.line_total?.toFixed(2)}
+                  x{item.quantity} = Rs {item.line_total?.toFixed(2)}
                 </span>
               </div>
             ))}
           </div>
           <div style={{ ...styles.totalRow, borderTop: '2px solid var(--clr-border)', paddingTop: '12px', marginTop: '8px' }}>
             <strong style={{ fontSize: '1.1rem' }}>Total</strong>
-            <strong style={{ fontSize: '1.25rem' }}>₹{cart.subtotal?.toFixed(2)}</strong>
+            <strong style={{ fontSize: '1.25rem' }}>Rs {cart.subtotal?.toFixed(2)}</strong>
           </div>
 
           {error && <div style={styles.error}>{error}</div>}
@@ -137,10 +137,10 @@ const CheckoutPage = () => {
           <button onClick={handleCheckout} disabled={processing} className="btn btn-primary"
             style={{ width: '100%', marginTop: '20px', padding: '14px', fontSize: '0.95rem' }}>
             <Lock size={16} />
-            {processing ? 'Processing...' : `Pay ₹${cart.subtotal?.toFixed(2)}`}
+            {processing ? 'Processing...' : `Pay Rs ${cart.subtotal?.toFixed(2)}`}
           </button>
           <p style={{ fontSize: '0.75rem', color: 'var(--clr-text-light)', textAlign: 'center', marginTop: '8px' }}>
-            🔒 Secure checkout. Your data is encrypted.
+            Secure checkout. Your data is encrypted.
           </p>
         </div>
       </div>

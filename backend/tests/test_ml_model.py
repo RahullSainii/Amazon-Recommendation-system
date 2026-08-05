@@ -10,6 +10,11 @@ import pytest
 import numpy as np
 import pandas as pd
 
+os.environ["APP_ENV"] = "test"
+os.environ["DB_BACKEND"] = "json"
+os.environ["DATABASE_URL"] = ""
+os.environ["DIRECT_URL"] = ""
+
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 

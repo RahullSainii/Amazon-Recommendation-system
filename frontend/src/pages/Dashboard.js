@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { RefreshCcw, Sparkles, Compass, TrendingUp, Activity, Brain, Star, ShoppingCart, Heart, BarChart3, MousePointerClick, ShoppingBag, Eye } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import API_URL from '../lib/apiBase';
+import ProductImage from '../components/ProductImage';
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -282,10 +283,7 @@ const DashProductCard = ({ product, index, addToCart, toggleWishlist, token, sho
         <div className={`card animate-fade-in-up stagger-${(index % 8) + 1}`} style={styles.prodCard}>
             <Link to={`/product/${product.product_id}`} onClick={logInteraction} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div style={styles.prodImgWrap}>
-                    <img src={product.img_link} alt={title}
-                        style={styles.prodImg}
-                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/180x180?text=No+Image'; }}
-                    />
+                    <ProductImage src={product.img_link} alt={title} height={170} />
                 </div>
                 <h3 style={styles.prodName}>{title}</h3>
             </Link>
@@ -336,7 +334,7 @@ const styles = {
         color: '#fff',
         marginTop: '10px',
         marginBottom: '8px',
-        letterSpacing: '-0.5px',
+        letterSpacing: 0,
     },
     heroSub: { color: 'rgba(255,255,255,0.6)', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '12px' },
     chipRow: { display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' },
@@ -344,8 +342,7 @@ const styles = {
     errorBanner: { background: 'var(--clr-danger-bg)', color: 'var(--clr-danger)', padding: '12px 20px', borderRadius: '12px', marginBottom: '20px', fontWeight: 600 },
     emptyState: { textAlign: 'center', padding: '40px 20px' },
     prodCard: { padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px' },
-    prodImgWrap: { height: '170px', background: '#f8f9fa', borderRadius: '12px', display: 'grid', placeItems: 'center', overflow: 'hidden' },
-    prodImg: { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', transition: 'transform 0.3s' },
+    prodImgWrap: { marginBottom: '2px' },
     prodName: { fontSize: '0.88rem', fontWeight: 600, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' },
     prodPriceRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
     explanationText: { fontSize: '0.75rem', color: 'var(--clr-text-muted)', lineHeight: 1.45, minHeight: '34px' },

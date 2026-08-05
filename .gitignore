@@ -49,3 +49,16 @@ backend/.tmp/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Runtime data - never commit
+backend/data/users.json
+backend/data/carts.json
+backend/data/wishlists.json
+backend/data/orders.json
+backend/data/interactions.json
+backend/data/preferences.json
+backend/data/recommendation_history.json
+backend/data/user_experiment_assignments.json
+frontend_backup/
+backend/package-lock.json
+backend/.tmp/

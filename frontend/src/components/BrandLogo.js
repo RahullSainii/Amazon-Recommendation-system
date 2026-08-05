@@ -49,7 +49,7 @@ const BrandLogo = ({ size = 'md', showWordmark = true, dark = false, align = 'le
             style={{
               fontSize: sizeStyles.titleSize,
               fontWeight: 800,
-              letterSpacing: '-0.03em',
+              letterSpacing: 0,
               color: dark ? '#ffffff' : 'var(--clr-text)',
               lineHeight: 1,
             }}

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useShop } from '../context/ShopContext';
 import { Star, ShoppingCart, Heart, ArrowLeft, Tag, Truck, Shield, Sparkles } from 'lucide-react';
 import API_URL from '../lib/apiBase';
+import ProductImage from '../components/ProductImage';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -73,11 +74,11 @@ const ProductDetails = () => {
                 {/* Image */}
                 <div style={styles.imageSection}>
                     <div style={styles.imageContainer}>
-                        <img
+                        <ProductImage
                             src={product.img_link}
                             alt={product.product_name}
-                            style={styles.mainImage}
-                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/500x500?text=No+Image'; }}
+                            height={380}
+                            imageStyle={styles.mainImage}
                         />
                     </div>
                 </div>
@@ -149,7 +150,7 @@ const ProductDetails = () => {
                             onClick={async () => {
                                 if (!user) return navigate('/login');
                                 await addToCart(id, qty);
-                                showToast('✓ Added to cart');
+                                showToast('Added to cart');
                             }}
                             className="btn btn-primary"
                             style={{ flex: 1, padding: '14px 20px', fontSize: '0.95rem' }}
@@ -160,7 +161,7 @@ const ProductDetails = () => {
                             onClick={async () => {
                                 if (!user) return navigate('/login');
                                 const res = await toggleWishlist(id);
-                                showToast(res.in_wishlist ? '♥ Added to wishlist' : 'Removed from wishlist');
+                                showToast(res.in_wishlist ? 'Added to wishlist' : 'Removed from wishlist');
                             }}
                             className="btn btn-secondary"
                             style={{ padding: '14px 20px' }}
@@ -203,10 +204,7 @@ const SimilarProductCard = ({ product, index }) => {
             style={styles.similarCard}
         >
             <div style={styles.simImgWrap}>
-                <img src={product.img_link} alt={title}
-                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/150x150?text=No+Image'; }}
-                />
+                <ProductImage src={product.img_link} alt={title} height={140} />
             </div>
             <h4 style={styles.simTitle}>{title}</h4>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -246,7 +244,7 @@ const styles = {
     detailSection: { display: 'flex', flexDirection: 'column', gap: '6px' },
     productTitle: {
         fontSize: '1.6rem', fontWeight: 800, lineHeight: 1.3,
-        color: 'var(--clr-text)', letterSpacing: '-0.5px',
+        color: 'var(--clr-text)', letterSpacing: 0,
     },
     ratingSection: { display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' },
     ratingStars: { display: 'flex', gap: '2px' },
@@ -289,10 +287,7 @@ const styles = {
         textDecoration: 'none', color: 'inherit', padding: '14px',
         display: 'flex', flexDirection: 'column', gap: '6px',
     },
-    simImgWrap: {
-        height: '140px', borderRadius: '10px', background: '#f8f9fa',
-        display: 'grid', placeItems: 'center', overflow: 'hidden',
-    },
+    simImgWrap: {},
     simTitle: {
         fontSize: '0.82rem', fontWeight: 600, lineHeight: 1.3,
         display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
